@@ -22,11 +22,17 @@ const repoGit = path.resolve(repo, '.git')
 const spawn = require('child_process').spawn;
 const spawnSync = require('child_process').spawnSync;
 
-var branchCmd = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repo })
-var branch = `${branchCmd.stdout}`.trim()
+function currentBranch() {
+  var branchCmd = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repo })
+  return `${branchCmd.stdout}`.trim()
+}
+var branch = currentBranch()
 
-var remoteCmd = spawnSync('git', ['config', `branch.${branch}.remote`], { cwd: repo })
-var remote = `${remoteCmd.stdout}`.trim() || 'origin'
+function currentRemote() {
+  var remoteCmd = spawnSync('git', ['config', `branch.${branch}.remote`], { cwd: repo })
+  return `${remoteCmd.stdout}`.trim() || 'origin'
+}
+var remote = currentRemote()
 
 const blessed = require("blessed")
 const watch = require("watch")
@@ -187,23 +193,28 @@ const watchRepoOpts = {
 watch.watchTree(repo, watchRepoOpts, function (f, curr, prev) {
   var msg = null
   var commit = false
+  const filename = path.relative(repo, f)
+
   if (typeof f == "object" && prev === null && curr === null) {
     msg = `watching ${repo} for changes`
   } else if (prev === null) {
-    msg = `adding file ${f}`
+    msg = `adding file ${filename}`
     commit = true
   } else if (curr.nlink === 0) {
-    msg = `removing file ${f}`
+    msg = `removing file ${filename}`
     commit = true
   } else {
-    msg = `changed file ${f}`
+    msg = `changed file ${filename}`
     commit = true
   }
 
   if (msg) {
     puts(msg)
 
-    if (mergeConflict && mergeConflictCheck()) {
+    if (branch != currentBranch()) {
+      puts(`Branch change detected, ignoring (was {bold}${branch}{/} now {bold}${currentBranch()}{/})`)
+    }
+    else if (mergeConflict && mergeConflictCheck()) {
       puts('Waiting for merge conflict resolution')
     }
     else if (commit) {
