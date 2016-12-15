@@ -1,0 +1,15 @@
+{
+  "name": "repo-watcher",
+  "version": "0.0.1",
+  "description": "todo",
+  "repository": "git@github.com:ello/repo-watcher.git",
+  "license": "MIT",
+  "bin": {
+    "repowatch": "./index.js"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "commander": "^2.9.0",
+    "watch": "^1.0.1"
+  }
+}
