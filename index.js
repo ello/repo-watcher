@@ -186,14 +186,15 @@ watch.watchTree(repo, watchMergeOpts, function (f, curr, prev) {
 })
 
 const watchRepoOpts = {
+  interval: 0.1,
   filter: function(file, stat) {
-    return !file.includes('/.git/')
+    return !file.includes('/.git/') && !file.includes('/Build/') && !file.includes('/vendor/')
   }
 }
 watch.watchTree(repo, watchRepoOpts, function (f, curr, prev) {
   var msg = null
   var commit = false
-  const filename = path.relative(repo, f)
+  const filename = (typeof f == "string" ? path.relative(repo, f) : null)
 
   if (typeof f == "object" && prev === null && curr === null) {
     msg = `watching ${repo} for changes`
