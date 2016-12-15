@@ -133,18 +133,20 @@ function commitWith(msg) {
 
   exec('git', ['add', '.'])
   exec('git', ['commit', '-m', msg])
-  exec('git', ['pull', remote, branch], function() {
+  if (exec('git', ['pull', remote, branch])) {
+    exec('git', ['push', remote, branch])
+  }
+  else {
     mergeConflictCheck({ output: true })
-  })
+  }
 }
 
-function exec(cmd, args, err) {
+function exec(cmd, args) {
   var cmd = spawnSync(cmd, args, { cwd: repo })
   puts(cmd.stderr)
   puts(cmd.stdout)
-  if (cmd.code !== 0 && err) {
-    err()
-  }
+
+  return !cmd.code
 }
 
 function puts() {
