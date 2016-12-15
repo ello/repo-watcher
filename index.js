@@ -95,18 +95,23 @@ screen.append(remoteBox)
 
 
 const commandsBox = blessed.box({
-  left: '75%',
+  left: '50%',
   width: '50%',
   top: 1,
   height: 1,
   fg: '#ffffff',
   tags: true,
-  content: `{bold}q: quit{/}`,
+  align: 'center',
+  content: `{bold}q: quit{/}    {bold}k: clear log{/}`,
 })
 screen.append(commandsBox)
 
 screen.key(['escape', 'q', 'C-c'], function(ch, key) {
   return process.exit(0)
+})
+
+screen.key(['k'], function(ch, key) {
+  log.setContent('')
 })
 
 var mergeConflict = false
