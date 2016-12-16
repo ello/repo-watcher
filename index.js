@@ -202,6 +202,10 @@ watch.watchTree(repo, watchRepoOpts, function (f, curr, prev) {
   var msg = null
   var commit = false
   const filename = (typeof f == "string" ? path.relative(repo, f) : null)
+  if (filename && !filename.endsWith('.swift')) {
+    puts(`ignoring ${filename}`)
+    return
+  }
 
   if (typeof f == "object" && prev === null && curr === null) {
     msg = `watching ${repo} for changes`
