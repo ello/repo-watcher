@@ -180,12 +180,13 @@ function puts() {
 
 const watchMergeOpts = {
   filter: function(file, stat) {
-    return !file.includes('/.git/') || file.includes('.git/MERGE_HEAD')
+    return file.includes('.git/MERGE_HEAD')
   }
 }
-watch.watchTree(repo, watchMergeOpts, function (f, curr, prev) {
+const gitFolder = path.resolve(repo, '.git')
+watch.watchTree(gitFolder, watchMergeOpts, function (f, curr, prev) {
   if (curr && curr.nlink === 0) {
-    puts('merge conflict resolved!')
+    puts(`merge conflict resolved! (${f})`)
     if (prevCommitMsg) {
       commitWith(prevCommitMsg)
     }
